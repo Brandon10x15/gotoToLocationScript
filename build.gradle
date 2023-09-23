@@ -1,0 +1,236 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+}
+
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = 'https://repo.runelite.net'
+    }
+    mavenCentral()
+}
+
+def runeLiteVersion = getRuneLiteVersion()
+
+static def getRuneLiteVersion() {
+    URL url = new URL("http://repo.runelite.net/net/runelite/client/maven-metadata.xml")
+    URLConnection urlConnection = url.openConnection()
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+            urlConnection.getInputStream()))
+    String latestName = null
+    String inputLine
+    while ((inputLine = bufferedReader.readLine()) != null) {
+        inputLine = inputLine.trim()
+        if (inputLine.contains("<release>")) {
+            latestName = inputLine.replace("<release>", "").replace("</release>", "")
+        }
+    }
+    bufferedReader.close()
+    return latestName
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    implementation project(":OSRSBot")
+
+    implementation group: 'net.runelite', name: 'client', version: runeLiteVersion
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.36'
+
+    implementation group: 'net.sf.jopt-simple', name:'jopt-simple', version: '5.0.4'
+
+    //implementation group: 'net.runelite', name:'client', version: runeLiteVersion
+
+    testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
+    testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
+    //We want these both at compile and at runtime.
+    //So we use implementation instead of compileOnly or runtimeOnly
+    
+    //implementation 'com.github.OSRSB:OSRSBot:master-SNAPSHOT'
+    //implementation 'com.github.OSRSB:DaxWalkerOSRSBot:master-SNAPSHOT'
+    implementation project(":DaxWalkerRSB")
+}
+
+group = 'osrsb'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs= ["src/main/java"]
+        }
+    }
+}
+
+jar {
+    configurations.implementation.setCanBeResolved(true)
+    from {
+        configurations.implementation.filter {it.name.startsWith('Dax')}.collect {zipTree(it)}
+    }
+
+    exclude 'META-INF/*.RSA'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+enum OperatingSystem {
+    MAC, WINDOWS, LINUX, UNKNOWN
+
+    static def getOperatingSystem() {
+        final String os = System.getProperty("os.name")
+        if (os.contains("Mac")) {
+            return MAC
+        } else if (os.contains("Windows")) {
+            return WINDOWS
+        } else if (os.contains("Linux")) {
+            return LINUX
+        } else {
+            return UNKNOWN
+        }
+    }
+}
+
+class ScriptTask extends DefaultTask {
+    static String getBotScriptDirectory() {
+        final String NAME = "OsrsBot"
+        final String SCRIPT_DIRECTORY = "/Scripts/Sources"
+        final String env = System.getenv(NAME.toUpperCase().concat("_HOME"))
+        if (env == null || env.isEmpty()) {
+            String homeDirBuilder = System.getProperty("user.home")
+            switch(OperatingSystem.getOperatingSystem()) {
+                case OperatingSystem.LINUX:
+                    homeDirBuilder += File.separator + ".config"
+                    break
+                case OperatingSystem.MAC:
+                    homeDirBuilder += (homeDirBuilder == null) ? "~" : ""
+                    break
+                case OperatingSystem.WINDOWS:
+                    //Do nothing
+                    break
+                default:
+                    //If you're using Solaris or something you're wrong.
+                    break
+            }
+            return (homeDirBuilder + File.separator + NAME + SCRIPT_DIRECTORY)
+        }
+        return env
+    }
+
+    def copyLargeDir(File dirFrom, File dirTo) {
+        if (!dirTo.exists()) {
+            dirTo.mkdir()
+        }
+
+        dirFrom.eachFile(groovy.io.FileType.FILES) { File source ->
+            File target = new File(dirTo, source.getName())
+            target.bytes = source.bytes
+        }
+
+        dirFrom.eachFile(groovy.io.FileType.DIRECTORIES) { File source ->
+            File target = new File(dirTo, source.getName())
+            copyLargeDir(source, target)
+        }
+    }
+
+    @InputDirectory
+    var scriptDependency =
+            project.file("${project.buildDir}/classes/java/main")
+
+    @OutputDirectory
+    var outputDir =
+            project.file(getBotScriptDirectory())
+
+    @TaskAction
+    def copyFiles() {
+        copyLargeDir(scriptDependency, outputDir)
+    }
+}
+
+task outputToScriptDirectory(type: ScriptTask) {
+    group = 'TEST'
+    dependsOn(classes)
+}
+
+task botRunGUI(type: JavaExec) {
+    group = "Execution"
+    description = "Runs the main method within RSB"
+    classpath = sourceSets.main.compileClasspath + sourceSets.main.runtimeClasspath
+    getMainClass() set "net.runelite.rsb.botLauncher.Application"
+    String jvmArgString = (OperatingSystem.MAC == OperatingSystem.getOperatingSystem()) ?
+            "-debug --add-opens=java.desktop/com.apple.eawt=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED" :
+            "-debug"
+    jvmArgs jvmArgString.split(" ")
+    args "--bot-runelite --developer-mode".split(" ")
+    dependsOn(outputToScriptDirectory)
+}
+
+task botRunHeadless(type: JavaExec) {
+    group = "Execution"
+    description = "Runs the main method within RSB"
+    classpath = sourceSets.main.compileClasspath + sourceSets.main.runtimeClasspath
+    getMainClass() set "net.runelite.rsb.botLauncher.Application"
+    String jvmArgString = (OperatingSystem.MAC == OperatingSystem.getOperatingSystem()) ?
+            "-debug --add-opens=java.desktop/com.apple.eawt=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED" :
+            "-debug"
+    jvmArgs jvmArgString.split(" ")
+    args "--bot-runelite --developer-mode --headless".split(" ")
+    dependsOn(outputToScriptDirectory)
+}
+
+task dockerBuild(type: Exec) {
+    group = "Docker"
+    description = "Builds the docker image"
+    commandLine 'docker', 'build', '-t', 'bot-image', '.'
+    dependsOn classes
+}
+
+task dockerRunGUI(type: Exec) {
+    group = "Docker"
+    description = "Runs the Docker image on the host XServer"
+    commandLine 'docker', 'run', '-e', 'DISPLAY=host.docker.internal:0', '-t', '--rm', 'bot-image'
+    dependsOn dockerBuild
+}
+
+task dockerRunHeadless(type: Exec) {
+    group = "Docker"
+    description = "Runs the Docker image on the host XServer"
+    commandLine 'docker', 'run', '-e', 'DISPLAY=host.docker.internal:0', '-t', '--rm', 'bot-image', '--headless'
+    dependsOn dockerBuild
+}
+
+task dockerCompose(type: Exec) {
+    group = "Docker"
+    commandLine 'docker', 'compose', '-f', 'docker-compose.yml', 'up', '--build', '--no-deps',  '-d'
+}
+
+task dockerComposeForceBuild(type: Exec) {
+    group = "Docker"
+    commandLine 'docker', 'compose', '-f', 'docker-compose.yml', 'build', '--no-cache', 'script'
+    commandLine 'docker', 'compose', '-f', 'docker-compose.yml', 'up', '--build', '--force-recreate', '--no-deps',  '-d'
+}
+
+task dockerComposeWithWireGuard(type: Exec) {
+    group = "Docker"
+    commandLine 'docker', 'compose', '-f', 'docker-compose-wireguard.yml', 'up', '--build', '--no-deps',  '-d'
+}
+task dockerComposeWithWireGuardForceBuild(type: Exec) {
+    group = "Docker"
+    commandLine 'docker', 'compose', '-f', 'docker-compose-wireguard.yml', 'build', '--no-cache', 'script'
+    commandLine 'docker', 'compose', '-f', 'docker-compose-wireguard.yml', 'up', '--build', '--force-recreate', '--no-deps',  '-d'
+}
