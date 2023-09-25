@@ -38,13 +38,14 @@ public class GCannon extends Script implements PaintListener {
     private final int cannonball = 2;
     private final int ammomould = 4;
     private final int steelbar = 2353;
-    private final RSTile furnace[] = { new RSTile(3110, 3502),
-            new RSTile(3273, 3186) };
-    private final RSTile bankBooth[] = { new RSTile(3097, 3496),
-            new RSTile(3269, 3169) };
+    private final RSTile furnace[] = {new RSTile(ctx, 3110, 3502),
+            new RSTile(ctx, 3273, 3186)};
+    private final RSTile bankBooth[] = {new RSTile(ctx, 3097, 3496),
+            new RSTile(ctx, 3269, 3169)};
 
-    private final RSTile furnaceBldg[] = { new RSTile(3108, 3500),
-            new RSTile(3275, 3184) };;
+    private final RSTile furnaceBldg[] = {new RSTile(ctx, 3108, 3500),
+            new RSTile(ctx, 3275, 3184)};
+    ;
 
     private void antiBan() {
         final int random = random(1, 24);
