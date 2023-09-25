@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="OSRSBot">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../DeviousWalkerOSRSBot" />
+      <root url="file://$PROJECT_DIR$/../DeviousWalkerOSRSBot" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../DeviousWalkerOSRSBot" recursive="false" />
+  </library>
+</component>
