@@ -46,7 +46,7 @@ dependencies {
     implementation group: 'net.runelite', name: 'client', version: runeLiteVersion
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.slf4j:slf4j-simple:1.7.36'
+    //testImplementation 'org.slf4j:slf4j-simple:1.7.36'
 
     implementation group: 'net.sf.jopt-simple', name:'jopt-simple', version: '5.0.4'
 
