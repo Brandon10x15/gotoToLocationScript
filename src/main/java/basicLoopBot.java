@@ -1,7 +1,6 @@
 import devious_walker.pathfinder.Walker;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.rsb.methods.Methods;
-import net.runelite.rsb.methods.NPCs;
 import net.runelite.rsb.script.Script;
 import net.runelite.rsb.script.ScriptManifest;
 import net.runelite.rsb.wrappers.RSNPC;
@@ -36,7 +35,7 @@ public class basicLoopBot extends Script {
                 // We are already fighting
             }
             // Here's the start of our loop
-            RSNPC chicken = NPCs.methods.npcs.getNearest("Cow"); // Find the nearest chicken
+            RSNPC chicken = this.ctx.npcs.getNearest("Cow"); // Find the nearest chicken
             // If there's not an NPC available, let's walk to the area
             if (chicken != null) {
                 Logger.getLogger(getClass().getName()).info("Cow not null");

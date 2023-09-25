@@ -2,7 +2,7 @@ package functions;
 
 import devious_walker.pathfinder.Walker;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.rsb.methods.NPCs;
+import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.script.Script;
 import net.runelite.rsb.wrappers.RSNPC;
 import net.runelite.rsb.wrappers.RSPlayer;
@@ -40,10 +40,10 @@ public class functions {
         sleep(minMax.min, minMax.max);
     }
 
-    public static RSNPC getNearestNPC(String[] npcs) {
+    public static RSNPC getNearestNPC(MethodContext ctx, String[] npcs) {
         RSNPC npc = null;
         for (var name : npcs) {
-            npc = NPCs.methods.npcs.getNearestNotInCombat(name); // Find the nearest npc
+            npc = ctx.npcs.getNearestNotInCombat(name); // Find the nearest npc
             if (npc != null) {
                 break;
             }
@@ -51,10 +51,10 @@ public class functions {
         return npc;
     }
 
-    public static RSNPC getNearestNPC(int[] npcs) {
+    public static RSNPC getNearestNPC(MethodContext ctx, int[] npcs) {
         RSNPC npc = null;
         for (var id : npcs) {
-            npc = NPCs.methods.npcs.getNearestNotInCombat(id); // Find the nearest npc
+            npc = ctx.npcs.getNearestNotInCombat(id); // Find the nearest npc
             if (npc != null) {
                 break;
             }
@@ -119,7 +119,7 @@ public class functions {
                     return getRandNum(600);
                     // We are already fighting
                 }
-                RSNPC npc = getNearestNPC(npcs);
+                RSNPC npc = getNearestNPC(script.ctx, npcs);
                 // If there's not an NPC available, let's walk to the area
                 if (npc == null) {
                     walkToWorldPoint(npcArea, "NPC Area");
