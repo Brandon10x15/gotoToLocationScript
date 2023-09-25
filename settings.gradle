@@ -1,5 +1,5 @@
  rootProject.name = 'OSRSBot'
+ include ":DeviousWalkerRSB"
  include ":OSRSBot"
- include ":DaxWalkerRSB"
+ project(":DeviousWalkerRSB").projectDir = file("../DeviousWalkerOSRSBot")
  project(":OSRSBot").projectDir = file("../OSRSBot")
- project(":DaxWalkerRSB").projectDir = file("../DaxWalkerOSRSBot")

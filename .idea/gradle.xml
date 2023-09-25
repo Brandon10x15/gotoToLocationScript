@@ -5,9 +5,21 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/../DeviousWalkerOSRSBot" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/../DeviousWalkerOSRSBot" />
+            <option value="$PROJECT_DIR$/../OSRSBot" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/../DeviousWalkerOSRSBot" />
+            <option value="$PROJECT_DIR$/../OSRSBot" />
             <option value="$PROJECT_DIR$" />
           </set>
         </option>

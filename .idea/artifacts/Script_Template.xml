@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="Script Template">
-    <output-path>$USER_HOME$/GService/Scripts/Precompiled</output-path>
+    <output-path>$USER_HOME$/OsrsBot/Scripts/Precompiled</output-path>
     <root id="archive" name="Script Template.jar">
-      <element id="module-output" name="Script_Template.main" />
+      <element id="module-output" name="com.github.OSRSB.OSRSBot.main" />
     </root>
   </artifact>
 </component>

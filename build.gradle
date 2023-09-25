@@ -59,7 +59,7 @@ dependencies {
     
     //implementation 'com.github.OSRSB:OSRSBot:master-SNAPSHOT'
     //implementation 'com.github.OSRSB:DaxWalkerOSRSBot:master-SNAPSHOT'
-    implementation project(":DaxWalkerRSB")
+    implementation project(":DeviousWalkerRSB")
 }
 
 group = 'osrsb'
@@ -79,7 +79,7 @@ sourceSets {
 jar {
     configurations.implementation.setCanBeResolved(true)
     from {
-        configurations.implementation.filter {it.name.startsWith('Dax')}.collect {zipTree(it)}
+        configurations.implementation.filter { it.name.startsWith('Devious') }.collect { zipTree(it) }
     }
 
     exclude 'META-INF/*.RSA'
