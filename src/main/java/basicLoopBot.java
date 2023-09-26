@@ -1,4 +1,4 @@
-import devious_walker.pathfinder.Walker;
+import devious_walker.DeviousWalker;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.rsb.methods.Methods;
 import net.runelite.rsb.script.Script;
@@ -44,7 +44,7 @@ public class basicLoopBot extends Script {
 
                 if (!chicken.isOnScreen() || (chicken.getLocation() != null && getMyPlayer().getLocation().distanceTo(chicken.getLocation()) > 10)) {
                     // We're a bit far, let's walk a little closer
-                    Walker.walkTo(chicken.getLocation().getWorldLocation());
+                    DeviousWalker.walkTo(ctx, chicken.getLocation().getWorldLocation());
                     Logger.getLogger(getClass().getName()).info("Pathing to cow");
                     Methods.sleep(700, 1200);
                 } else if (!chicken.isInCombat() && !chicken.isInteractingWithLocalPlayer() && !getMyPlayer().isInCombat()) {
@@ -78,7 +78,7 @@ public class basicLoopBot extends Script {
             } else {
                 // Chicken is null, we should find one
                 Logger.getLogger(getClass().getName()).info("Walking");
-                Walker.walkTo(chickenCoop);
+                DeviousWalker.walkTo(ctx, chickenCoop);
                 Methods.sleep(700, 1200);
             }
         } catch (NullPointerException | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {

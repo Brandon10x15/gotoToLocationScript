@@ -1,6 +1,6 @@
 package functions;
 
-import devious_walker.pathfinder.Walker;
+import devious_walker.DeviousWalker;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.script.Script;
@@ -62,8 +62,8 @@ public class functions {
         return npc;
     }
 
-    public static void walkToWorldPoint(WorldPoint location, String name) {
-        Walker.walkTo(location);
+    public static void walkToWorldPoint(MethodContext ctx, WorldPoint location, String name) {
+        DeviousWalker.walkTo(ctx, location);
         Logger.getLogger("functions.walkToNPC").info("Walking towards " + name + ".");
         sleepRand(600);
     }
@@ -122,18 +122,18 @@ public class functions {
                 RSNPC npc = getNearestNPC(script.ctx, npcs);
                 // If there's not an NPC available, let's walk to the area
                 if (npc == null) {
-                    walkToWorldPoint(npcArea, "NPC Area");
+                    walkToWorldPoint(script.ctx, npcArea, "NPC Area");
                     return getRandNum(600);
                 }
                 if (npc.getLocation() == null) {
-                    walkToWorldPoint(npcArea, "NPC Area");
+                    walkToWorldPoint(script.ctx, npcArea, "NPC Area");
                     return getRandNum(600);
                 }
                 Logger.getLogger(script.getClass().getName()).info("Found " + npc.getName() + ".");
 
                 if (!npc.isOnScreen() || (player.getLocation().distanceTo(npc.getLocation()) > 10)) {
                     // We're a bit far, let's walk a little closer
-                    walkToWorldPoint(npc.getLocation().getWorldLocation(), npc.getName());
+                    walkToWorldPoint(script.ctx, npc.getLocation().getWorldLocation(), npc.getName());
                     return getRandNum(600);
                 }
                 if (!npc.isInteractingWithLocalPlayer() && !player.isInCombat()) {
